@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset = "utf-8">
+<title> MOVEMENT </title>
+</head>
+
+<body>
+<script type = "text/javascript">
+//------------------------------------------------------------------------------
+// VARIABLES are set here so they're GLOBAL (everything may access them)
+//------------------------------------------------------------------------------
+
+let lock_left = true
+let lock_top = true
+let lock_right = true
+let lock_bottom = true
+
+//------------------------------------------------------------------------------
+
+let html; let htmls
+let body; let bodys
+let avatar; let avatars
+
+//------------------------------------------------------------------------------
+
+let avatar_x = 0
+let avatar_y = 0
+
+//------------------------------------------------------------------------------
+// EVERY map will be an object, and every object needs a CREATE function that
+// will happen only ONCE and an UPDATE function that will repeat itself
+//------------------------------------------------------------------------------
+
+const map_main =
+{
+    create: function()
+        {
+            html = document.querySelector( "html" ); htmls = html.style
+            body = document.querySelector( "body" ); bodys = body.style
+        },
+
+    //--------------------------------------------------------------------------
+
+    update: function()
+        {
+            htmls.width = "100%"
+            htmls.height = "100%"
+            htmls.margin = "0"
+
+            bodys.width = "100%"
+            bodys.height = "100%"
+            bodys.margin = "0"
+
+            bodys.backgroundColor = "rgb( 120, 200, 80 )"
+        },
+}
+
+//------------------------------------------------------------------------------
+
+const map_avatar =
+{
+    create: function()
+        {
+            avatar = document.createElement( "div" ); avatars = avatar.style
+            body.appendChild( avatar )
+        },
+
+    //--------------------------------------------------------------------------
+
+    update: function()
+        {
+            avatars.width = "64px"
+            avatars.height = "64px"
+            avatars.backgroundColor = "rgb( 200, 80, 120 )"
+
+            avatars.position = "absolute"
+            avatars.top = avatar_y + "px"
+            avatars.left = avatar_x + "px"
+        },
+}
+
+//------------------------------------------------------------------------------
+// BELOW are the 2 main gears of the engine
+//------------------------------------------------------------------------------
+
+// EVERY code that only needs to happen once is called here
+const master_create = function()
+{
+    map_main.create()
+    map_avatar.create()
+}
+
+//------------------------------------------------------------------------------
+
+// EVERYTHING that needs constant updates is called here
+const master_update = function()
+{
+    map_main.update()
+    map_avatar.update()
+
+    movement()
+
+    window.requestAnimationFrame( master_update )
+}
+
+//------------------------------------------------------------------------------
+// BELOW is showing how the keyboard affects the locks
+//------------------------------------------------------------------------------
+
+const press = function( pressed )
+{
+    if( pressed.keyCode === 37 || pressed.keyCode === 69 ) lock_left = false
+    if( pressed.keyCode === 38 || pressed.keyCode === 82 ) lock_top = false
+    if( pressed.keyCode === 39 || pressed.keyCode === 70 ) lock_right = false
+    if( pressed.keyCode === 40 || pressed.keyCode === 68 ) lock_bottom = false
+}
+
+//------------------------------------------------------------------------------
+
+const release = function( released )
+{
+    if( released.keyCode === 37 || released.keyCode === 69 ) lock_left = true
+    if( released.keyCode === 38 || released.keyCode === 82 ) lock_top = true
+    if( released.keyCode === 39 || released.keyCode === 70 ) lock_right = true
+    if( released.keyCode === 40 || released.keyCode === 68 ) lock_bottom = true
+}
+
+//------------------------------------------------------------------------------
+// BELOW will check the LOCKS and use them to change AVATAR_X and AVATAR_Y
+//------------------------------------------------------------------------------
+
+const movement = function()
+{
+    if( lock_left === false ) avatar_x -= 10
+    if( lock_top === false ) avatar_y -= 10
+    if( lock_right === false ) avatar_x += 10
+    if( lock_bottom === false ) avatar_y += 10
+}
+
+//------------------------------------------------------------------------------
+// BELOW we call the 2 gears and everything will work
+//------------------------------------------------------------------------------
+
+master_create() // will be called only ONCE
+master_update() // will repeat forever due to "window.requestAnimationFrame()"
+
+//------------------------------------------------------------------------------
+// LISTENERS should go after the engine starts rolling
+//------------------------------------------------------------------------------
+
+body.addEventListener( "keydown", press, false )
+body.addEventListener( "keyup", release, false )
+
+//------------------------------------------------------------------------------
+</script>
+</body>
+
+</html>
